@@ -1,5 +1,4 @@
 {
-  "color": "blue",
-  "number": "two",
-  "pet": "cat"
+  "animal": "cat",
+  "number": "three"
 }
