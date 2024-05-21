@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func TransformJSON(args []string) error {
+func HandleJSON(args []string) error {
 	jsonFile, err := os.Open("input.json")
 	if err != nil {
 		return err
@@ -26,12 +26,30 @@ func TransformJSON(args []string) error {
 		return err
 	}
 
-	if len(args) == 0 {
-		log.Println("No operations to perform, copying input.json to output.json")
-		return os.WriteFile("output.json", file, 0644)
+	err = TransformJSON(data, args)
+	if err != nil {
+		return err
 	}
-	// Modify data
-	for _, op := range args {
+
+	modifiedDataBytes, err := json.MarshalIndent(data, "", "  ")
+	if err != nil {
+		return err
+	}
+
+	if err := os.WriteFile("output.json", modifiedDataBytes, 0644); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+func TransformJSON(data map[string]string, operations []string) (error) {
+	if len(operations) == 0 {
+		log.Println("No operations to perform")
+		return nil
+	}
+
+	for _, op := range operations {
 		parts := strings.Split(op, ":")
 		if len(parts) < 2 {
 			return fmt.Errorf("invalid operation: %s", op)
@@ -41,11 +59,13 @@ func TransformJSON(args []string) error {
 		switch operation {
 		case "set":
 			if len(parts) != 3 {
+				log.Printf("invalid operation: %s, ignoring", op)
 				continue
 			}
 			data[key] = parts[2]
 		case "rename":
 			if len(parts) != 3 {
+				log.Printf("invalid operation: %s, ignoring", op)
 				continue
 			}
 			value, ok := data[key];
@@ -67,15 +87,5 @@ func TransformJSON(args []string) error {
 		}
 	}
 
-	modifiedData, err := json.MarshalIndent(data, "", "  ")
-	if err != nil {
-		return err
-	}
-
-	// Write data on output.json
-	if err := os.WriteFile("output.json", modifiedData, 0644); err != nil {
-		return err
-	}
-
-	return nil
+	return  nil
 }

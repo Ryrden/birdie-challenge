@@ -13,7 +13,7 @@ var rootCmd = &cobra.Command{
 	Short: "Transform operations on a JSON file.",
 	Long: "",
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := handler.TransformJSON(args); err != nil {
+		if err := handler.HandleJSON(args); err != nil {
 			log.Fatalf("Error: %v", err)
 		}
 	},
