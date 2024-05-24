@@ -10,33 +10,45 @@ import (
 )
 
 func HandleJSON(args []string) error {
-	jsonFile, err := os.Open("input.json")
+	data, err := readFile("input.json")
 	if err != nil {
 		return err
+	}
+
+	if err := TransformJSON(data, args); err != nil {
+		return err
+	}
+
+	return saveFile("output.json", data)
+}
+
+func readFile(filename string) (map[string]string, error) {
+	jsonFile, err := os.Open(filename)
+	if err != nil {
+		return nil, err
 	}
 	defer jsonFile.Close()
 
 	file, err := io.ReadAll(jsonFile)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var data map[string]string
 	if err := json.Unmarshal(file, &data); err != nil {
-		return err
+		return nil, err
 	}
 
-	err = TransformJSON(data, args)
-	if err != nil {
-		return err
-	}
+	return data, nil
+}
 
+func saveFile(filename string, data map[string]string) error {
 	modifiedDataBytes, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
 		return err
 	}
 
-	if err := os.WriteFile("output.json", modifiedDataBytes, 0644); err != nil {
+	if err := os.WriteFile(filename, modifiedDataBytes, 0644); err != nil {
 		return err
 	}
 
