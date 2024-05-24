@@ -1,4 +1,4 @@
 {
-  "number": "three",
-  "pet": "cat"
+  "animal": "cat",
+  "number": "three"
 }
